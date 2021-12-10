@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/home"
+        android:icon="@drawable/ic_home"
+        android:title="Home" />
+
+    <item
+        android:id="@+id/rawat_jalan"
+        android:icon="@drawable/ic_box"
+        android:title="Rawat Jalan" />
+    <item
+        android:id="@+id/rawat_inap"
+        android:icon="@drawable/ic_scroll"
+        android:title="Rawat Inap" />
+    <item
+        android:id="@+id/setting"
+        android:icon="@drawable/ic_settings"
+        android:title="Setting" />
+</menu>
