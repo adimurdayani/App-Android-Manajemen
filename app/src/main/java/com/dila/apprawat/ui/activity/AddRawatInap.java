@@ -4,16 +4,21 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -25,28 +30,38 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.dila.apprawat.R;
 import com.dila.apprawat.network.api.URLServer;
+import com.dila.apprawat.network.model.Penyakit;
+import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 
-@SuppressLint( "SetTextI18n" )
+@SuppressLint("SetTextI18n")
 public class AddRawatInap extends AppCompatActivity {
     private TextView nama, text_kirim;
-    private EditText edt_nama_pasien, edt_Kelamin, edt_phone, edt_umur, edt_pekerjaan, edt_tgl_masuk, edt_p_jawab,
+    private EditText edt_nama_pasien, edt_phone, edt_umur, edt_pekerjaan, edt_tgl_masuk, edt_p_jawab,
             edt_pekerjaan_p_jawab, edt_alamat, edt_keterangan;
+    private Spinner edt_Kelamin;
+    private SearchableSpinner nama_penyakit;
     private ProgressBar progress;
     private LinearLayout btn_kirim;
     private SharedPreferences preferences;
     private StringRequest kirimData;
     private String nama_pasien, Kelamin, phone, umur, pekerjaan, tgl_masuk,
-            p_jawab, pekerjaan_p_jawab, alamat, keterangan;
+            p_jawab, pekerjaan_p_jawab, alamat, keterangan, id_penyakit;
     private ImageView btn_kembali;
+    DatePickerDialog datePickerDialog;
+    ArrayList<Penyakit> listpenyakit;
+    private ArrayList<String> list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +71,86 @@ public class AddRawatInap extends AppCompatActivity {
         setInit();
         setDisplay();
         setButton();
+        setDate();
+        setSpinner();
+    }
+
+    private void getPenyakit() {
+        listpenyakit = new ArrayList<>();
+        list = new ArrayList<>();
+        kirimData = new StringRequest(Request.Method.GET, URLServer.GETPENYAKIT, response -> {
+            try {
+                JSONObject object = new JSONObject(response);
+                if (object.getBoolean("status")) {
+                    list = new ArrayList<>();
+                    JSONArray dataArray = new JSONArray(object.getString("data"));
+                    for (int i = 0; i < dataArray.length(); i++) {
+                        JSONObject data = dataArray.getJSONObject(i);
+                        Penyakit getPenyakit  = new Penyakit();
+                        getPenyakit.setId(data.getInt("id"));
+                        getPenyakit.setNama_penyakit(data.getString("nama_penyakit"));
+                        listpenyakit.add(getPenyakit);
+                    }
+                    for (int i = 0; i < listpenyakit.size(); i++) {
+                        list.add(listpenyakit.get(i).getNama_penyakit());
+                    }
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, list);
+                    nama_penyakit.setAdapter(adapter);
+                } else {
+                    showError(object.getString("message"));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                showError(e.toString());
+            }
+        }, error -> {
+            showError(error.toString());
+        });
+        setErrorNetwork();
+        RequestQueue koneksi = Volley.newRequestQueue(this);
+        koneksi.add(kirimData);
+    }
+
+    private void setDate() {
+        edt_tgl_masuk.setOnClickListener(v -> {
+            final Calendar c = Calendar.getInstance();
+            int mYear = c.get(Calendar.YEAR); // current year
+            int mMonth = c.get(Calendar.MONTH); // current month
+            int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+            datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                    edt_tgl_masuk.setText(dayOfMonth + "/" + (month + 1) + "/" + year);
+                }
+            }, mYear, mMonth, mDay);
+            datePickerDialog.show();
+        });
+    }
+
+    private void setSpinner() {
+        edt_Kelamin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Kelamin = edt_Kelamin.getSelectedItem().toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        nama_penyakit.setTitle("Pilih Penyakit");
+        nama_penyakit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                id_penyakit = String.valueOf(listpenyakit.get(position).getId());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     private void setDisplay() {
@@ -110,6 +205,7 @@ public class AddRawatInap extends AppCompatActivity {
                 map.put("p_jawab", p_jawab);
                 map.put("pekerjaan_p_jawab", pekerjaan_p_jawab);
                 map.put("keterangan", keterangan);
+                map.put("nama_penyakit", id_penyakit);
                 return map;
             }
         };
@@ -122,10 +218,6 @@ public class AddRawatInap extends AppCompatActivity {
         setInputText();
         if (nama_pasien.isEmpty()) {
             edt_nama_pasien.setError("Kolom nama pasien tidak boleh kosong!");
-            return false;
-        }
-        if (Kelamin.isEmpty()) {
-            edt_Kelamin.setError("Kolom kelamin tidak boleh kosong!");
             return false;
         }
         if (phone.isEmpty()) {
@@ -165,7 +257,6 @@ public class AddRawatInap extends AppCompatActivity {
 
     private void setInputText() {
         nama_pasien = edt_nama_pasien.getText().toString().trim();
-        Kelamin = edt_Kelamin.getText().toString().trim();
         phone = edt_phone.getText().toString().trim();
         umur = edt_umur.getText().toString().trim();
         pekerjaan = edt_pekerjaan.getText().toString().trim();
@@ -192,6 +283,7 @@ public class AddRawatInap extends AppCompatActivity {
         progress = findViewById(R.id.progress);
         btn_kirim = findViewById(R.id.btn_kirim);
         btn_kembali = findViewById(R.id.btn_kembali);
+        nama_penyakit = findViewById(R.id.nama_penyakit);
     }
 
     private void setErrorNetwork() {
@@ -226,5 +318,11 @@ public class AddRawatInap extends AppCompatActivity {
         new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE).setTitleText("Oops...")
                 .setContentText(string)
                 .show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getPenyakit();
     }
 }

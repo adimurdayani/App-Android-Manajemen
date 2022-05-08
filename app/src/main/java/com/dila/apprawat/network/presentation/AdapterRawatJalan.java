@@ -1,10 +1,13 @@
 package com.dila.apprawat.network.presentation;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,9 +15,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.dila.apprawat.R;
 import com.dila.apprawat.network.model.RawatJalan;
+import com.dila.apprawat.ui.activity.DetailRawatInap;
+import com.dila.apprawat.ui.activity.DetailRawatJalan;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 
 public class AdapterRawatJalan extends RecyclerView.Adapter<AdapterRawatJalan.HolderData> {
     private Context context;
@@ -33,12 +43,28 @@ public class AdapterRawatJalan extends RecyclerView.Adapter<AdapterRawatJalan.Ho
         return new HolderData(view);
     }
 
+    @SuppressLint("SimpleDateFormat")
     @Override
     public void onBindViewHolder(@NonNull HolderData holder, int position) {
         RawatJalan jalan = rawatJalans.get(position);
         holder.nama.setText(jalan.getNama_pasien());
         holder.norekam.setText(jalan.getNo_rekam_jalan());
-        holder.tgl_berobat.setText(jalan.getTgl_berobat());
+
+        String tglLama = jalan.getTgl_berobat();
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            String tglBaru = dateFormat.format(df.parse(tglLama));
+            holder.tgl_berobat.setText(tglBaru);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        holder.layout.setOnClickListener(v -> {
+            Intent i = new Intent(context, DetailRawatJalan.class);
+            i.putExtra("id", jalan.getId());
+            context.startActivity(i);
+        });
     }
 
     @Override
@@ -80,11 +106,13 @@ public class AdapterRawatJalan extends RecyclerView.Adapter<AdapterRawatJalan.Ho
 
     public class HolderData extends RecyclerView.ViewHolder {
         private TextView norekam, nama, tgl_berobat;
+        LinearLayout layout;
         public HolderData(@NonNull View itemView) {
             super(itemView);
             norekam = itemView.findViewById(R.id.norekam);
             nama = itemView.findViewById(R.id.nama);
             tgl_berobat = itemView.findViewById(R.id.tgl_berobat);
+            layout = itemView.findViewById(R.id.layout);
         }
     }
 }

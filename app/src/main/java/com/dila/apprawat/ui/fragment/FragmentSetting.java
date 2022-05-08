@@ -5,16 +5,19 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -24,12 +27,18 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.dila.apprawat.R;
 import com.dila.apprawat.network.api.URLServer;
+import com.dila.apprawat.network.model.User;
+import com.dila.apprawat.network.presentation.AdapterUser;
 import com.dila.apprawat.ui.activity.BantuanActivity;
 import com.dila.apprawat.ui.activity.LoginActivity;
 import com.dila.apprawat.ui.activity.TentangActivity;
 import com.dila.apprawat.ui.activity.UbahPasswod;
 import com.dila.apprawat.ui.activity.UbahProfile;
+import com.dila.apprawat.ui.activity.UploadImage;
+import com.mikhaellopez.circularimageview.CircularImageView;
+import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,6 +49,7 @@ public class FragmentSetting extends Fragment {
     private TextView nama, phone, email, alamat;
     private RelativeLayout btn_ubahprofile, btn_ubahpassword, btn_bantuan, btn_tentang, btn_logout;
     private SharedPreferences preferences;
+    private CircularImageView image;
     private StringRequest logout;
 
     public FragmentSetting() {
@@ -58,7 +68,7 @@ public class FragmentSetting extends Fragment {
         return view;
     }
 
-    private void setLogout(){
+    private void setLogout() {
         SweetAlertDialog pDialog = new SweetAlertDialog(requireActivity(), SweetAlertDialog.PROGRESS_TYPE);
         pDialog.setTitleText("Loading");
         pDialog.setCancelable(false);
@@ -71,6 +81,7 @@ public class FragmentSetting extends Fragment {
                     editor.remove(preferences.getString("token", ""));
                     editor.remove(String.valueOf(preferences.getInt("id_regis", 0)));
                     editor.remove(preferences.getString("nama", ""));
+                    editor.putBoolean("isLoggedIn", false);
                     editor.clear();
                     editor.apply();
 
@@ -110,12 +121,6 @@ public class FragmentSetting extends Fragment {
         queue.add(logout);
     }
 
-    private void showError(String string) {
-        new SweetAlertDialog(requireActivity(), SweetAlertDialog.ERROR_TYPE).setTitleText("Oops...")
-                .setContentText(string)
-                .show();
-    }
-
     private void setButton() {
         btn_bantuan.setOnClickListener(v -> {
             startActivity(new Intent(requireActivity(), BantuanActivity.class));
@@ -140,6 +145,10 @@ public class FragmentSetting extends Fragment {
                         sDialog.dismissWithAnimation();
                     }).show();
         });
+
+        image.setOnClickListener(v -> {
+            startActivity(new Intent(requireActivity(), UploadImage.class));
+        });
     }
 
     private void setDisplay() {
@@ -147,6 +156,65 @@ public class FragmentSetting extends Fragment {
         phone.setText(preferences.getString("no_hp", ""));
         email.setText(preferences.getString("email", ""));
         alamat.setText(preferences.getString("alamat", ""));
+    }
+
+    private void setImage() {
+        int id = preferences.getInt("id_m", 0);
+        logout = new StringRequest(Request.Method.GET, URLServer.GETGAMBAR + id, response -> {
+            if (response != null) {
+                try {
+                    JSONObject object = new JSONObject(response);
+                    if (object.getBoolean("status")) {
+                        JSONObject data = object.getJSONObject("data");
+                        Picasso.get()
+                                .load(URLServer.IMAGE + data.getString("image"))
+                                .placeholder(R.drawable.ic_user2)
+                                .error(R.drawable.ic_user2)
+                                .into(image);
+                    } else {
+                        showError(object.getString("message"));
+                    }
+                } catch (JSONException e) {
+                    showError(e.toString());
+                }
+            } else {
+                showError(null);
+            }
+        }, error -> {
+            Log.d("respon", "err: " + error.networkResponse);
+        });
+        setNetworkError();
+        RequestQueue koneksi = Volley.newRequestQueue(requireActivity());
+        koneksi.add(logout);
+    }
+
+    private void showError(String string) {
+        new SweetAlertDialog(requireContext(), SweetAlertDialog.ERROR_TYPE)
+                .setTitleText("Oops...")
+                .setContentText(string)
+                .show();
+    }
+
+    private void setNetworkError() {
+        logout.setRetryPolicy(new RetryPolicy() {
+            @Override
+            public int getCurrentTimeout() {
+                return 2000;
+            }
+
+            @Override
+            public int getCurrentRetryCount() {
+                return 2000;
+            }
+
+            @Override
+            public void retry(VolleyError error) throws VolleyError {
+                if (Looper.myLooper() == null) {
+                    Looper.prepare();
+                    showError("Koneksi gagal!");
+                }
+            }
+        });
     }
 
     private void setInit() {
@@ -159,5 +227,12 @@ public class FragmentSetting extends Fragment {
         btn_bantuan = view.findViewById(R.id.btn_bantuan);
         btn_tentang = view.findViewById(R.id.btn_tentang);
         btn_logout = view.findViewById(R.id.btn_logout);
+        image = view.findViewById(R.id.image);
+    }
+
+    @Override
+    public void onResume() {
+        setImage();
+        super.onResume();
     }
 }

@@ -90,6 +90,7 @@ public class FragmentRawatJalan extends Fragment {
                 } catch (JSONException e) {
                     showError(e.toString());
                 }
+                sw_data.setRefreshing(false);
             } else {
                 showError(null);
             }
@@ -123,7 +124,8 @@ public class FragmentRawatJalan extends Fragment {
     }
 
     private void showError(String string) {
-        new SweetAlertDialog(requireActivity(), SweetAlertDialog.ERROR_TYPE).setTitleText("Oops...")
+        new SweetAlertDialog(requireContext(), SweetAlertDialog.ERROR_TYPE)
+                .setTitleText("Oops...")
                 .setContentText(string)
                 .show();
     }

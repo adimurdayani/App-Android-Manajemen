@@ -3,7 +3,15 @@ package com.dila.apprawat.network.model;
 public class User {
     private int id_m, nik, status;
     private String nama, tgl_lahir, kelamin, gol_darah, agama,
-            pekerjaan, alamat, email, username, no_hp, t_lahir, created_at, member_id;
+            pekerjaan, alamat, email, username, no_hp, t_lahir, created_at, member_id, image;
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 
     public String getMember_id() {
         return member_id;

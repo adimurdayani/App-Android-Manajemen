@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".ui.activity.AddRawatInap">
 
@@ -85,7 +86,7 @@
                 android:inputType="textCapSentences"
                 android:padding="16dp" />
 
-            <EditText
+            <Spinner
                 android:id="@+id/Kelamin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -93,7 +94,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
                 android:background="@drawable/bg_input"
-                android:hint="Kelamin"
+                android:entries="@array/kelamin"
                 android:inputType="textCapSentences"
                 android:padding="16dp" />
 
@@ -144,6 +145,16 @@
                 android:hint="Tanggal Masuk"
                 android:inputType="date"
                 android:padding="16dp" />
+
+            <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                android:id="@+id/nama_penyakit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/bg_input"
+                android:padding="10dp" />
 
             <EditText
                 android:id="@+id/p_jawab"

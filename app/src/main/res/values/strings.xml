@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">App Rawat</string>
+    <string-array name="gol_darah">
+        <item>Pilih golongan darah</item>
+        <item>A</item>
+        <item>B</item>
+        <item>AB</item>
+        <item>O</item>
+    </string-array>
+
+    <string-array name="agama">
+        <item>Pilih agama</item>
+        <item>Islam</item>
+        <item>Hidu</item>
+        <item>Budha</item>
+        <item>Kristen</item>
+        <item>Katolik</item>
+    </string-array>
+
+    <string-array name="kelamin">
+        <item>Pilih jenis kelamin</item>
+        <item>Perempuan</item>
+        <item>Laki-Laki</item>
+    </string-array>
 </resources>

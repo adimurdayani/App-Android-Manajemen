@@ -2,7 +2,7 @@ package com.dila.apprawat.network.model;
 
 public class Ruangan {
     private int id;
-    private String nama_ruangan,alamat;
+    private String nama_ruangan;
 
     public int getId() {
         return id;
@@ -18,13 +18,5 @@ public class Ruangan {
 
     public void setNama_ruangan(String nama_ruangan) {
         this.nama_ruangan = nama_ruangan;
-    }
-
-    public String getAlamat() {
-        return alamat;
-    }
-
-    public void setAlamat(String alamat) {
-        this.alamat = alamat;
     }
 }

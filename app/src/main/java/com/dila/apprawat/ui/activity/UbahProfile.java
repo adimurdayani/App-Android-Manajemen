@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,10 +14,13 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.Patterns;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -34,17 +38,21 @@ import com.dila.apprawat.ui.fragment.FragmentSetting;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-@SuppressLint( "SetTextI18n" )
+@SuppressLint("SetTextI18n")
 public class UbahProfile extends AppCompatActivity {
 
     private ImageView btn_kembali;
-    private EditText edt_t_lahir, edt_tgl_lahir, edt_kelamin, edt_gol_darah, edt_agama,
+    private EditText edt_t_lahir, edt_tgl_lahir,
             edt_pekerjaan, edt_alamat, edt_nik;
+    private Spinner edt_kelamin,
+            edt_gol_darah,
+            edt_agama;
     private LinearLayout btn_simpan;
     private ProgressBar progress;
     private TextView text_simpan, nama;
@@ -52,6 +60,7 @@ public class UbahProfile extends AppCompatActivity {
     private String t_lahir, tgl_lahir, kelamin, gol_darah, agama, pekerjaan, alamat, nik, member_id;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
+    DatePickerDialog datePickerDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,16 +70,70 @@ public class UbahProfile extends AppCompatActivity {
         setInit();
         setDisplay();
         setButton();
+        setSpinner();
+        setDate();
+    }
+
+    private void setDate() {
+        edt_tgl_lahir.setOnClickListener(v -> {
+            final Calendar c = Calendar.getInstance();
+            int mYear = c.get(Calendar.YEAR); // current year
+            int mMonth = c.get(Calendar.MONTH); // current month
+            int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+            datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                    edt_tgl_lahir.setText(dayOfMonth + "/" + (month + 1) + "/" + year);
+                }
+            }, mYear, mMonth, mDay);
+            datePickerDialog.show();
+        });
+    }
+
+    private void setSpinner() {
+
+        edt_kelamin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                kelamin = edt_kelamin.getSelectedItem().toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        edt_agama.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                agama = edt_agama.getSelectedItem().toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        edt_gol_darah.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                gol_darah = edt_gol_darah.getSelectedItem().toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     private void setDisplay() {
         member_id = preferences.getString("member_id", "");
-        nama.setText("Selamat Datang "+preferences.getString("nama", ""));
+        nama.setText("Selamat Datang " + preferences.getString("nama", ""));
         edt_t_lahir.setText(preferences.getString("t_lahir", ""));
         edt_tgl_lahir.setText(preferences.getString("tgl_lahir", ""));
-        edt_kelamin.setText(preferences.getString("kelamin", ""));
-        edt_gol_darah.setText(preferences.getString("gol_darah", ""));
-        edt_agama.setText(preferences.getString("agama", ""));
         edt_pekerjaan.setText(preferences.getString("pekerjaan", ""));
         edt_alamat.setText(preferences.getString("alamat", ""));
         edt_nik.setText("" + preferences.getInt("nik", 0));
@@ -84,9 +147,9 @@ public class UbahProfile extends AppCompatActivity {
                 JSONObject object = new JSONObject(response);
                 if (object.getBoolean("status")) {
                     JSONObject data = object.getJSONObject("data");
-
                     editor = preferences.edit();
                     editor.putInt("nik", data.getInt("nik"));
+                    editor.putInt("id_m", preferences.getInt("id_m", 0));
                     editor.putString("tgl_lahir", data.getString("tgl_lahir"));
                     editor.putString("kelamin", data.getString("kelamin"));
                     editor.putString("gol_darah", data.getString("gol_darah"));
@@ -162,6 +225,13 @@ public class UbahProfile extends AppCompatActivity {
     private void showDialog() {
         new SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE)
                 .setTitleText("Sukses!")
+                .setConfirmText("Oke")
+                .setConfirmClickListener(sweetAlertDialog -> {
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                })
                 .show();
     }
 
@@ -191,18 +261,6 @@ public class UbahProfile extends AppCompatActivity {
             edt_tgl_lahir.setError("Kolom tanggal lahir tidak boleh kosong!");
             return false;
         }
-        if (kelamin.isEmpty()) {
-            edt_kelamin.setError("Kolom jenis kelamin tidak boleh kosong!");
-            return false;
-        }
-        if (gol_darah.isEmpty()) {
-            edt_gol_darah.setError("Kolom golongan darah tidak boleh kosong!");
-            return false;
-        }
-        if (agama.isEmpty()) {
-            edt_agama.setError("Kolom agama tidak boleh kosong!");
-            return false;
-        }
         if (pekerjaan.isEmpty()) {
             edt_pekerjaan.setError("Kolom pekerjaan tidak boleh kosong!");
             return false;
@@ -217,9 +275,6 @@ public class UbahProfile extends AppCompatActivity {
     private void setInputText() {
         t_lahir = edt_t_lahir.getText().toString().trim();
         tgl_lahir = edt_tgl_lahir.getText().toString().trim();
-        kelamin = edt_kelamin.getText().toString().trim();
-        gol_darah = edt_gol_darah.getText().toString().trim();
-        agama = edt_agama.getText().toString().trim();
         pekerjaan = edt_pekerjaan.getText().toString().trim();
         alamat = edt_alamat.getText().toString().trim();
         nik = edt_nik.getText().toString().trim();

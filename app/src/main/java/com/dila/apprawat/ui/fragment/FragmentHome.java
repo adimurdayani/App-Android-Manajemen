@@ -167,7 +167,7 @@ public class FragmentHome extends Fragment {
     }
 
     private void showError(String string) {
-        new SweetAlertDialog(requireActivity(), SweetAlertDialog.ERROR_TYPE)
+        new SweetAlertDialog(requireContext(), SweetAlertDialog.ERROR_TYPE)
                 .setTitleText("Oops...")
                 .setContentText(string)
                 .show();

@@ -4,16 +4,25 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppRawat"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.activity.AddRawatInap"></activity>
+        <activity android:name=".ui.activity.UploadImage"></activity>
+        <activity android:name=".ui.activity.DetailRawatJalan" />
+        <activity android:name=".ui.activity.DetailRawatInap" />
+        <activity android:name=".ui.activity.AddRawatInap" />
         <activity android:name=".ui.activity.AddRawatJalan" />
         <activity android:name=".ui.activity.BantuanActivity" />
         <activity android:name=".ui.activity.TentangActivity" />
@@ -28,6 +37,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".fcm.NotifInstanceService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".fcm.NotificationService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

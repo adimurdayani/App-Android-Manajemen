@@ -1,8 +1,16 @@
 package com.dila.apprawat.network.model;
 
 public class Penyakit {
-    private int id;
+    private int id, ruangan;
     private String nama_penyakit;
+
+    public int getRuangan() {
+        return ruangan;
+    }
+
+    public void setRuangan(int ruangan) {
+        this.ruangan = ruangan;
+    }
 
     public int getId() {
         return id;

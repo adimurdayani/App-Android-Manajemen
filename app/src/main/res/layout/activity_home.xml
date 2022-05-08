@@ -18,11 +18,10 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <ImageView
+            <com.mikhaellopez.circularimageview.CircularImageView
+                android:id="@+id/img_user"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:background="@drawable/bg_input"
-                android:padding="5dp"
                 android:src="@drawable/ic_user" />
 
             <TextView
@@ -39,11 +38,11 @@
     </androidx.appcompat.widget.Toolbar>
 
     <FrameLayout
-        android:layout_below="@id/top"
         android:id="@+id/frm_home"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/btn_navigasi" />
+        android:layout_above="@+id/btn_navigasi"
+        android:layout_below="@id/top" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/btn_navigasi"
@@ -51,6 +50,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:elevation="10dp"
-        app:menu="@menu/menu"/>
+        app:menu="@menu/menu" />
 
 </RelativeLayout>

@@ -32,6 +32,7 @@ import com.dila.apprawat.R;
 import com.dila.apprawat.network.api.URLServer;
 import com.dila.apprawat.network.model.User;
 import com.dila.apprawat.ui.activity.UbahProfile;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,12 +76,6 @@ public class FragmentRegister extends Fragment {
                 JSONObject object = new JSONObject(response);
                 if (object.getBoolean("status")) {
                     JSONObject data = object.getJSONObject("data");
-                    User postUser = new User();
-                    postUser.setNama(data.getString("nama"));
-                    postUser.setUsername(data.getString("username"));
-                    postUser.setEmail(data.getString("email"));
-                    postUser.setNo_hp(data.getString("no_hp"));
-
                     preferences = requireActivity().getSharedPreferences("user", Context.MODE_PRIVATE);
                     editor = preferences.edit();
                     editor.putString("member_id", data.getString("member_id"));
@@ -108,12 +103,14 @@ public class FragmentRegister extends Fragment {
             @Nullable
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
+                String fcm = FirebaseInstanceId.getInstance().getToken();
                 HashMap<String, String> map = new HashMap<>();
                 map.put("nama", nama);
                 map.put("email", email);
                 map.put("username", username);
                 map.put("password", password);
                 map.put("no_hp", phone);
+                map.put("fcm", fcm);
                 return map;
             }
         };

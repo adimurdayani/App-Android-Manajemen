@@ -107,12 +107,13 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
+                android:hint="Pilih tanggal lahir"
                 android:background="@drawable/bg_input"
-                android:hint="Tanggal Lahir"
+                android:datePickerMode="spinner"
                 android:inputType="date"
                 android:padding="16dp" />
 
-            <EditText
+            <Spinner
                 android:id="@+id/kelamin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -120,11 +121,11 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
                 android:background="@drawable/bg_input"
-                android:hint="Jenis Kelamin"
+                android:entries="@array/kelamin"
                 android:inputType="textCapSentences"
                 android:padding="16dp" />
 
-            <EditText
+            <Spinner
                 android:id="@+id/gol_darah"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -132,11 +133,11 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
                 android:background="@drawable/bg_input"
-                android:hint="Golongan Darah"
                 android:inputType="textCapSentences"
+                android:entries="@array/gol_darah"
                 android:padding="16dp" />
 
-            <EditText
+            <Spinner
                 android:id="@+id/agama"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -144,7 +145,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="10dp"
                 android:background="@drawable/bg_input"
-                android:hint="Agama"
+                android:entries="@array/agama"
                 android:inputType="textCapSentences"
                 android:padding="16dp" />
 
